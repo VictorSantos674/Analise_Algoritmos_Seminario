@@ -3,6 +3,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "Dijkstra",
+      "request": "launch",
+      "mainClass": "Dijkstra.Dijkstra",
+      "projectName": "Graphs_94116967"
+    },
+    {
+      "type": "java",
       "name": "FilaDePrioridade",
       "request": "launch",
       "mainClass": "Dijkstra.FilaDePrioridade",
