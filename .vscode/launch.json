@@ -2,6 +2,20 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "java",
+      "name": "FilaDePrioridade",
+      "request": "launch",
+      "mainClass": "Dijkstra.FilaDePrioridade",
+      "projectName": "Graphs_94116967"
+    },
+    {
+      "type": "java",
+      "name": "Fila",
+      "request": "launch",
+      "mainClass": "Dijkstra.Fila",
+      "projectName": "Graphs_94116967"
+    },
+    {
       "name": "C/C++ Runner: Debug Session",
       "type": "cppdbg",
       "request": "launch",

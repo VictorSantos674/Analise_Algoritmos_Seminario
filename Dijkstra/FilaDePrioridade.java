@@ -1,5 +1,6 @@
 package Dijkstra;
 
+import java.util.Collections;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
@@ -9,8 +10,7 @@ import java.util.Queue;
 
 public class FilaDePrioridade {
     public static void main(String[] args) {
-        //PriorityQueue<Integer> filaDePrioridade = new PriorityQueue<>(new Comparator());
-        Queue<Integer> filaDePrioridade = new Queue<>(new Comparator());
+        Queue<Integer> filaDePrioridade = new PriorityQueue<>(Collections.reverseOrder());
         filaDePrioridade.add(2);
         filaDePrioridade.add(3);
         filaDePrioridade.add(1);
