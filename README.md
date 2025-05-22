@@ -70,7 +70,7 @@ java Main
 
 ## Autor
 
-* **Aluno:** Maiara Torres, Victor Santos, Maria Vitória, 
+* **Aluno:** Maiara Torres, Victor Santos, Gabriel Reis, João Rafael & Gustavo Melo 
 * **Disciplina:** Análise de Algoritmos
 * **Professor:** Robson Lins
 * **Instituição:** Universidade Católica de Pernambuco (UNICAP)
