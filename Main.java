@@ -1,93 +1,71 @@
 package Analise_Algoritmos_Seminario;
 
-import java.util.*;
+import java.util.Scanner;
+import Dijkstra.Dijkstra;
+import Floyd_Warshall.FloydWarshall;
+import Johnson.Johnson;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-
-        Grafo romania = new Grafo();
-
-        romania.addEdge("Oradea", "Zerind", 71);
-        romania.addEdge("Zerind", "Arad", 75);
-        romania.addEdge("Oradea", "Sibiu", 151);
-        romania.addEdge("Arad", "Sibiu", 140);
-        romania.addEdge("Arad", "Timisoara", 118);
-        romania.addEdge("Timisoara", "Lugoj", 111);
-        romania.addEdge("Lugoj", "Mehadia", 70);
-        romania.addEdge("Mehadia", "Drobeta", 75);
-        romania.addEdge("Drobeta", "Craiova", 120);
-        romania.addEdge("Craiova", "Rimnicu Vilcea", 146);
-        romania.addEdge("Craiova", "Pitesti", 138);
-        romania.addEdge("Rimnicu Vilcea", "Sibiu", 80);
-        romania.addEdge("Rimnicu Vilcea", "Pitesti", 97);
-        romania.addEdge("Sibiu", "Fagaras", 99);
-        romania.addEdge("Fagaras", "Bucharest", 211);
-        romania.addEdge("Pitesti", "Bucharest", 101);
-        romania.addEdge("Bucharest", "Giurgiu", 90);
-        romania.addEdge("Bucharest", "Urziceni", 85);
-        romania.addEdge("Urziceni", "Hirsova", 98);
-        romania.addEdge("Hirsova", "Eforie", 86);
-        romania.addEdge("Urziceni", "Vaslui", 142);
-        romania.addEdge("Vaslui", "Iasi", 92);
-        romania.addEdge("Iasi", "Neamt", 87);
+        Grafo romenia = new Grafo();
+        romenia.inicializarGrafo();
+        Scanner sc = new Scanner(System.in);
 
         while (true) {
-            System.out.print("Digite a cidade de origem: ");
-            String origem = scanner.nextLine();
-            System.out.print("Digite a cidade de destino: ");
-            String destino = scanner.nextLine();
-
-            if (!romania.getVertices().contains(origem)) {
-                System.out.println("Cidade de origem não existe no grafo. Tente novamente.");
+            System.out.println("\n=== Algoritmos de Caminho Mínimo ===");
+            System.out.println("1. Dijkstra");
+            System.out.println("2. Floyd-Warshall");
+            System.out.println("3. Johnson");
+            System.out.println("4. Mostrar grafo");
+            System.out.println("5. Sair");
+            System.out.print("Escolha: ");
+            int op;
+            try {
+                op = Integer.parseInt(sc.nextLine().trim());
+            } catch (Exception e) {
+                System.out.println("Opção inválida.");
                 continue;
             }
-            if (!romania.getVertices().contains(destino)) {
-                System.out.println("Cidade de destino não existe no grafo. Tente novamente.");
+            if (op == 5) {
+                System.out.println("Encerrando...");
+                break;
+            }
+            if (op == 4) {
+                romenia.printGraph();
+                continue;
+            }
+            if (op < 1 || op > 5) {
+                System.out.println("Opção inválida.");
                 continue;
             }
 
-            System.out.println("\n=== MENU ===");
-            System.out.println("1 - Dijkstra");
-            System.out.println("2 - Floyd-Warshall");
-            System.out.println("3 - Johnson");
-            System.out.println("0 - Sair");
-            System.out.print("Escolha uma opção: ");
-            int choice = scanner.nextInt();
-            scanner.nextLine();
+            System.out.print("Origem: ");
+            String origem = sc.nextLine().trim();
+            System.out.print("Destino: ");
+            String destino = sc.nextLine().trim();
 
-              switch (choice) {
-                case 1: {
-                    Map<String, Integer> distances = romania.dijkstra(origem);
-                    int dist = distances.getOrDefault(destino, Integer.MAX_VALUE);
-                    System.out.println("Distância de " + origem + " até " + destino + ": " + 
-                        (dist == Integer.MAX_VALUE ? "∞" : dist));
+            if (!romenia.getVertices().contains(origem) ||
+                !romenia.getVertices().contains(destino)) {
+                System.out.println("Vértice não encontrado no grafo.");
+                continue;
+            }
+
+            switch (op) {
+                case 1:
+                    new Dijkstra(romenia.getAdjacencyMap()).calcularMenorCaminho(origem, destino);
                     break;
-                }
-                case 2: {
-                    Map<String, Map<String, Integer>> distFW = romania.floydWarshall();
-                    int dist = distFW.getOrDefault(origem, Collections.emptyMap())
-                                     .getOrDefault(destino, Integer.MAX_VALUE);
-                    System.out.println("Distância de " + origem + " até " + destino + " (Floyd-Warshall): " +
-                        (dist == Integer.MAX_VALUE ? "∞" : dist));
+                case 2:
+                    new FloydWarshall(romenia.getAdjacencyMap()).calcularMenorCaminho(origem, destino);
                     break;
-                }
-                case 3: {
-                    Map<String, Map<String, Integer>> distJ = romania.johnson();
-                    int dist = distJ.getOrDefault(origem, Collections.emptyMap())
-                                    .getOrDefault(destino, Integer.MAX_VALUE);
-                    System.out.println("Distância de " + origem + " até " + destino + " (Johnson): " +
-                        (dist == Integer.MAX_VALUE ? "∞" : dist));
+                case 3:
+                    try {
+                        new Johnson(romenia.getAdjacencyMap()).calcularMenorCaminho(origem, destino);
+                    } catch (RuntimeException ex) {
+                        System.out.println("Erro: " + ex.getMessage());
+                    }
                     break;
-                }
-                case 0: {
-                    System.out.println("Saindo...");
-                    scanner.close();
-                    return;
-                }
-                default:
-                    System.out.println("Opção inválida!");
             }
         }
+        sc.close();
     }
 }
