@@ -3,81 +3,81 @@ package Floyd_Warshall;
 import java.util.*;
 
 public class Floyd_Warshall {
-    private final Map<String, Map<String, Integer>> grafo;
+    private Map<String, Map<String, Integer>> graph;
 
-    public Floyd_Warshall() {
-        this.grafo = new HashMap<>();
+    public Floyd_Warshall(Map<String, Map<String, Integer>> graph) {
+        this.graph = graph;
     }
 
-    public void addEdge(String origem, String destino, int peso) {
-        grafo.computeIfAbsent(origem, k -> new HashMap<>()).put(destino, peso);
-    }
+    public void calcularMenorCaminho(String origem, String destino) {
+        long startTime = System.nanoTime();
 
-    public void calcularTodosMenoresCaminhos() {
-        Set<String> vertices = new HashSet<>(grafo.keySet());
-        for (Map<String, Integer> vizinhos : grafo.values()) {
-            vertices.addAll(vizinhos.keySet());
+        Set<String> nodes = graph.keySet();
+        List<String> nodeList = new ArrayList<>(nodes);
+        int n = nodeList.size();
+        Map<String, Integer> nodeIndex = new HashMap<>();
+
+        for (int i = 0; i < n; i++) {
+            nodeIndex.put(nodeList.get(i), i);
         }
 
-        List<String> listaVertices = new ArrayList<>(vertices);
-        int V = listaVertices.size();
+        int[][] dist = new int[n][n];
+        int[][] next = new int[n][n];
 
-        Map<String, Integer> indexMap = new HashMap<>();
-        for (int i = 0; i < V; i++) {
-            indexMap.put(listaVertices.get(i), i);
-        }
-
-        int[][] dist = new int[V][V];
-
-        // Inicializa matriz de distâncias
-        for (int i = 0; i < V; i++) {
+        for (int i = 0; i < n; i++) {
             Arrays.fill(dist[i], Integer.MAX_VALUE);
+            Arrays.fill(next[i], -1);
             dist[i][i] = 0;
         }
 
-        for (String u : grafo.keySet()) {
-            for (Map.Entry<String, Integer> entrada : grafo.get(u).entrySet()) {
-                String v = entrada.getKey();
-                int peso = entrada.getValue();
-                dist[indexMap.get(u)][indexMap.get(v)] = peso;
+        for (String u : graph.keySet()) {
+            int uIdx = nodeIndex.get(u);
+            for (Map.Entry<String, Integer> entry : graph.get(u).entrySet()) {
+                String v = entry.getKey();
+                int weight = entry.getValue();
+                int vIdx = nodeIndex.get(v);
+                dist[uIdx][vIdx] = weight;
+                next[uIdx][vIdx] = vIdx;
             }
         }
 
-        long inicio = System.nanoTime();
-
-        // Floyd-Warshall
-        for (int k = 0; k < V; k++) {
-            for (int i = 0; i < V; i++) {
-                for (int j = 0; j < V; j++) {
+        for (int k = 0; k < n; k++) {
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
                     if (dist[i][k] != Integer.MAX_VALUE && dist[k][j] != Integer.MAX_VALUE) {
-                        dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
+                        if (dist[i][j] > dist[i][k] + dist[k][j]) {
+                            dist[i][j] = dist[i][k] + dist[k][j];
+                            next[i][j] = next[i][k];
+                        }
                     }
                 }
             }
         }
 
-        long fim = System.nanoTime();
-        double tempoMs = (fim - inicio) / 1e6;
+        int origemIdx = nodeIndex.get(origem);
+        int destinoIdx = nodeIndex.get(destino);
 
-        System.out.println("\n--- Algoritmo de Floyd-Warshall ---");
-        System.out.printf("Tempo de execução: %.3f ms\n", tempoMs);
+        System.out.println("Floyd-Warshall");
+        System.out.println("Origem: " + origem + " | Destino: " + destino);
 
-        System.out.println("\nMatriz de distâncias mínimas:");
-        System.out.print("       ");
-        for (String v : listaVertices) {
-            System.out.printf("%10s", v);
-        }
-        System.out.println();
-
-        for (int i = 0; i < V; i++) {
-            System.out.printf("%10s", listaVertices.get(i));
-            for (int j = 0; j < V; j++) {
-                if (dist[i][j] == Integer.MAX_VALUE)
-                    System.out.printf("%10s", "INF");
-                else
-                    System.out.printf("%10d", dist[i][j]);
+        if (next[origemIdx][destinoIdx] == -1) {
+            System.out.println("Caminho não encontrado.");
+            System.out.println("Custo total: Infinito");
+        } else {
+            List<String> path = new ArrayList<>();
+            path.add(nodeList.get(origemIdx));
+            
+            int currentIdx = origemIdx;
+            while (currentIdx != destinoIdx) {
+                currentIdx = next[currentIdx][destinoIdx];
+                path.add(nodeList.get(currentIdx));
             }
-            System.out.println();
+
+            System.out.println("Caminho: " + String.join(" -> ", path));
+            System.out.println("Custo total: " + dist[origemIdx][destinoIdx]);
         }
+
+        double tempo = (System.nanoTime() - startTime) / 1e9;
+        System.out.printf("Tempo de execução: %.6f segundos%n", tempo);
     }
 }
