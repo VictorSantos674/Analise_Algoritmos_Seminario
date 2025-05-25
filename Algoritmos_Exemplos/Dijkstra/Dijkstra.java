@@ -3,72 +3,70 @@ package Dijkstra;
 import java.util.*;
 
 public class Dijkstra {
-    private final Map<String, Map<String, Integer>> grafo;
+    private Map<String, Map<String, Integer>> graph;
 
-    public Dijkstra() {
-        this.grafo = new HashMap<>();
+    public Dijkstra(Map<String, Map<String, Integer>> graph) {
+        this.graph = graph;
     }
 
-    public void addEdge(String origem, String destino, int peso) {
-        grafo.computeIfAbsent(origem, k -> new HashMap<>()).put(destino, peso);
-        grafo.computeIfAbsent(destino, k -> new HashMap<>()).put(origem, peso);
-    }
+    public void calcularMenorCaminho(String origem, String destino) {
+        long startTime = System.nanoTime();
 
-    public void calcularMenorCaminho(String origem, String destinoFinal) {
-        Map<String, Integer> dist = new HashMap<>();
-        Map<String, String> anterior = new HashMap<>();
-        for (String cidade : grafo.keySet()) {
-            dist.put(cidade, Integer.MAX_VALUE);
-            anterior.put(cidade, null);
+        Map<String, Integer> distances = new HashMap<>();
+        Map<String, String> predecessors = new HashMap<>();
+        PriorityQueue<String> queue = new PriorityQueue<>(Comparator.comparingInt(node -> distances.getOrDefault(node, Integer.MAX_VALUE)));
+
+        for (String node : graph.keySet()) {
+            distances.put(node, Integer.MAX_VALUE);
         }
+        distances.put(origem, 0);
+        queue.add(origem);
 
-        dist.put(origem, 0);
-        PriorityQueue<String> fila = new PriorityQueue<>(Comparator.comparingInt(dist::get));
-        fila.add(origem);
+        Set<String> visited = new HashSet<>();
 
-        long inicio = System.nanoTime();
+        while (!queue.isEmpty()) {
+            String current = queue.poll();
+            if (visited.contains(current)) continue;
+            visited.add(current);
 
-        while (!fila.isEmpty()) {
-            String atual = fila.poll();
+            Map<String, Integer> neighbors = graph.getOrDefault(current, Collections.emptyMap());
+            for (Map.Entry<String, Integer> neighbor : neighbors.entrySet()) {
+                String nextNode = neighbor.getKey();
+                int weight = neighbor.getValue();
 
-            for (Map.Entry<String, Integer> vizinho : grafo.getOrDefault(atual, Collections.emptyMap()).entrySet()) {
-                String cidadeVizinha = vizinho.getKey();
-                int peso = vizinho.getValue();
-
-                int novaDist = dist.get(atual) + peso;
-                if (novaDist < dist.get(cidadeVizinha)) {
-                    dist.put(cidadeVizinha, novaDist);
-                    anterior.put(cidadeVizinha, atual);
-                    fila.add(cidadeVizinha);
+                if (!visited.contains(nextNode)) {
+                    int newDist = distances.get(current) + weight;
+                    if (newDist < distances.getOrDefault(nextNode, Integer.MAX_VALUE)) {
+                        distances.put(nextNode, newDist);
+                        predecessors.put(nextNode, current);
+                        queue.add(nextNode);
+                    }
                 }
             }
         }
 
-        long fim = System.nanoTime();
-        double tempoMs = (fim - inicio) / 1e6;
+        long endTime = System.nanoTime();
+        double tempo = (endTime - startTime) / 1e9;
 
-        // Reconstrói o caminho
-        List<String> caminho = new ArrayList<>();
-        for (String at = destinoFinal; at != null; at = anterior.get(at)) {
-            caminho.add(at);
+        List<String> path = new ArrayList<>();
+        String current = destino;
+        boolean pathExists = distances.get(destino) != Integer.MAX_VALUE;
+
+        System.out.println("Dijkstra");
+        System.out.println("Origem: " + origem + " | Destino: " + destino);
+        
+        if (pathExists) {
+            while (current != null) {
+                path.add(current);
+                current = predecessors.get(current);
+            }
+            Collections.reverse(path);
+            System.out.println("Caminho: " + String.join(" -> ", path));
+            System.out.println("Custo total: " + distances.get(destino));
+        } else {
+            System.out.println("Caminho não encontrado.");
+            System.out.println("Custo total: Infinito");
         }
-        Collections.reverse(caminho);
-
-        // Saída
-        System.out.println("\n--- Algoritmo de Dijkstra ---");
-        System.out.printf("Tempo de execução: %.3f ms\n", tempoMs);
-        System.out.println("Distância total de " + origem + " até " + destinoFinal + ": " +
-                (dist.get(destinoFinal) == Integer.MAX_VALUE ? "∞" : dist.get(destinoFinal)));
-
-        System.out.print("Caminho: ");
-        for (int i = 0; i < caminho.size(); i++) {
-            System.out.print(caminho.get(i));
-            if (i < caminho.size() - 1) System.out.print(" -> ");
-        }
-        System.out.println();
-    }
-
-    public Set<String> getVertices() {
-        return grafo.keySet();
+        System.out.printf("Tempo de execução: %.6f segundos%n", tempo);
     }
 }
