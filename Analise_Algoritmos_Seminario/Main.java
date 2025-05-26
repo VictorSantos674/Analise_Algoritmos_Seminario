@@ -1,9 +1,9 @@
 package Analise_Algoritmos_Seminario;
 
-import java.util.Scanner;
 import Dijkstra.Dijkstra;
-import Floyd_Warshall.FloydWarshall;
+import Floyd_Warshall.Floyd_Warshall;
 import Johnson.Johnson;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
@@ -55,7 +55,7 @@ public class Main {
                     new Dijkstra(romenia.getAdjacencyMap()).calcularMenorCaminho(origem, destino);
                     break;
                 case 2:
-                    new FloydWarshall(romenia.getAdjacencyMap()).calcularMenorCaminho(origem, destino);
+                    new Floyd_Warshall(romenia.getAdjacencyMap()).calcularMenorCaminho(origem, destino);
                     break;
                 case 3:
                     try {
